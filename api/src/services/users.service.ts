@@ -6,6 +6,8 @@ import createHttpError from "http-errors";
 import {QueryResult} from "pg";
 import {SafeUserDto} from "../dto/safe-user.dto";
 import {JwtUserDto} from "../dto/jwt-user.dto";
+import {resolveObjectURL} from "buffer";
+import {generateUUID} from "../utils/utils.scripts";
 
 
 export const createUser = async (user: CreateUserDto) => {
@@ -68,3 +70,29 @@ export const updateRoleAndGetUser = async (id: number, role: number) => {
   }
 }
 
+const refreshConfirmationToken = async (id: number) => {
+  if (!id) return false;
+
+  try {
+    await pool.query<User>(
+      'UPDATE users SET confirmationToken = $1 WHERE id = $2',
+      [await generateUUID(), id])
+    return true;
+  } catch (error) {
+    console.log('Error while refreshing token:', error)
+    return false;
+  }
+}
+
+export const confirmEmailByToken = async (token: string) => {
+  try {
+    const result = await pool.query<User>(
+      'UPDATE users SET roleBits = $1 WHERE confirmationToken = $2 RETURNING id',
+      [Roles.USER, token])
+    refreshConfirmationToken(result.rows[0]?.id)
+
+    return !!result.rows.length;
+  } catch (error) {
+    throw createHttpError(500, ERRORS_MESSAGES.INTERNAL_SERVER_ERROR)
+  }
+}

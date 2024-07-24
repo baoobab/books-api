@@ -7,7 +7,7 @@ import {
   createUser,
   getUserByUsername,
   getUserById,
-  updateRoleAndGetUser, checkUserByEmail,
+  updateRoleAndGetUser, checkUserByEmail, confirmEmailByToken,
 } from '../services/users.service';
 import {RegisterUserDto} from "../dto/register-user.dto";
 import {CreateUserDto} from "../dto/create-user.dto";
@@ -43,7 +43,7 @@ export const register = async (req: Request, res: Response) => {
         status: 400
       })
     }
-    // await sendConfirmationMail(createdUser.email, confirmationToken) // с await'ом, т.к. гарантируем ответ от почтового сервиса
+    await sendConfirmationMail(createdUser.email, confirmationToken) // с await'ом, т.к. гарантируем ответ от почтового сервиса
     res.status(201).json(createdUser)
   } catch (error) {
     res.status(500).json({
@@ -77,7 +77,7 @@ export const login = async (req: Request, res: Response) => {
     })
     res.status(200).json({
       username: jwtUser.username,
-      token: token,
+      // token: token,
       status: 200
     })
   } catch (error) {
@@ -143,3 +143,25 @@ export const updateRole = async (req: Request, res: Response) => {
     })
   }
 }
+
+export const confirmEmail = async (req: Request, res: Response) => {
+  const token = req.query.token as string
+  try {
+    if (!await confirmEmailByToken(token)) {
+      return res.status(400).json({
+        message: ERRORS_MESSAGES.INVALID_TOKEN,
+        status: 400
+      })
+    }
+    res.status(200).json({
+      success: true,
+      status: 200
+    })
+  } catch (error) {
+    res.status(500).json({
+      message: ERRORS_MESSAGES.INTERNAL_SERVER_ERROR,
+      status: 500
+    })
+  }
+}
+

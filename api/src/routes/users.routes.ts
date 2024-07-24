@@ -1,9 +1,11 @@
 import {Router} from 'express';
 import {Roles} from "../shared/enums";
 import {jwtAuth} from "../middleware/auth";
-import {getCurrentUser, login, register, updateRole} from "../controllers/users.controller";
+import {confirmEmail, getCurrentUser, login, register, updateRole} from "../controllers/users.controller";
 
 const router = Router()
+
+router.get('/confirm', confirmEmail)
 
 router.post('/register', register)
 
