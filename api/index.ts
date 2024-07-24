@@ -3,9 +3,7 @@ import dotenv from 'dotenv';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsDoc from 'swagger-jsdoc';
 import {initDatabase} from "./src/utils/db.init";
-import pool from "./src/config/db";
-import {QueryResult} from "pg";
-import {User} from "./src/models/users.model";
+import BooksRoutes from "./src/routes/books.routes";
 
 async function bootstrap() {
   dotenv.config()
@@ -21,17 +19,17 @@ async function bootstrap() {
       },
     },
     apis: ["./src/routes/*.ts"],
-  };
-
+  }
   const specs: object = swaggerJsDoc(options)
   app.use(
     "/api-docs",
     swaggerUi.serve,
     swaggerUi.setup(specs)
-  );
-  app.use(express.json())
-
+  )
   await initDatabase()
+
+  app.use(express.json())
+  app.use('/books', BooksRoutes);
 
 
   app
