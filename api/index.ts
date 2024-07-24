@@ -4,6 +4,7 @@ import swaggerUi from 'swagger-ui-express';
 import swaggerJsDoc from 'swagger-jsdoc';
 import {initDatabase} from "./src/utils/db.init";
 import BooksRoutes from "./src/routes/books.routes";
+import UsersRoutes from "./src/routes/users.routes";
 
 async function bootstrap() {
   dotenv.config()
@@ -29,7 +30,8 @@ async function bootstrap() {
   await initDatabase()
 
   app.use(express.json())
-  app.use('/books', BooksRoutes);
+  app.use('/books', BooksRoutes)
+  app.use('/users', UsersRoutes)
 
 
   app
