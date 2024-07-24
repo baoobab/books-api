@@ -1,4 +1,6 @@
 import pool from '../config/db';
+import {generateUUID, hashString} from "./utils.scripts";
+import {Roles} from "../shared/enums";
 
 const createUsersTable = async () => {
   const query: string = `
@@ -29,11 +31,33 @@ const createBooksTable = async () => {
   await pool.query(query)
 }
 
+const createAdminUser = async () => {
+  const query: string = `
+        INSERT INTO users (
+        username, 
+        email, 
+        password, 
+        roleBits, 
+        confirmationToken
+        )
+        VALUES (
+            '${process.env.ADMIN_USERNAME}',   
+            '${process.env.ADMIN_EMAIL}',   
+            '${await hashString(process.env.ADMIN_PASSWORD || "adminSecretPass")}',   
+            ${Roles.ADMIN},
+            '${await generateUUID()}'
+        );
+    `
+  await pool.query(query)
+}
+
 
 export const initDatabase = async () => {
   try {
     await createUsersTable();
     await createBooksTable();
+    await createAdminUser();
+
     console.log('Db init was successful');
   } catch (error) {
     console.log('Error while init the db:', error);
