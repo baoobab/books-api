@@ -13,18 +13,46 @@ import {RegisterUserDto} from "../dto/register-user.dto";
 import {CreateUserDto} from "../dto/create-user.dto";
 import {SafeUserDto} from "../dto/safe-user.dto";
 import {LoginUserDto} from "../dto/login-user.dto";
-import {generateJWT, generateUUID, hashString} from "../utils/utils.scripts";
+import {
+  generateJWT,
+  generateUUID,
+  hashString,
+  validateEmail,
+  validatePassword,
+  validateUsername
+} from "../utils/utils.scripts";
 import {JwtUserDto} from "../dto/jwt-user.dto";
 
 
 export const register = async (req: Request, res: Response) => {
   try {
     const userDto: RegisterUserDto = req.body
+    if (!validateUsername(userDto.username)) {
+      return res.status(400).json({
+        message: ERRORS_MESSAGES.BAD_USERNAME_FORMAT,
+        error: "Username must be at least 4 characters long",
+        status: 400
+      })
+    }
+    if (!validateEmail(userDto.email)) {
+      return res.status(400).json({
+        message: ERRORS_MESSAGES.BAD_EMAIL_FORMAT,
+        status: 400
+      })
+    }
+    if (!validatePassword(userDto.password)) {
+      return res.status(400).json({
+        error: "Password must be at least 6 characters long, contain at least one letter and one number",
+        message: ERRORS_MESSAGES.BAD_PASSWORD_FORMAT,
+        status: 400
+      })
+    }
 
     if (await getUserByUsername(userDto.username) || await checkUserByEmail(userDto.email)) {
-      return res.status(400).json({
+      return res.status(409).json({
+        error: "User with this email or username already exists",
         message: ERRORS_MESSAGES.BAD_REQUEST,
-        status: 400
+        status: 409
       })
     }
 
@@ -158,6 +186,7 @@ export const confirmEmail = async (req: Request, res: Response) => {
       })
     }
     res.status(200).json({
+      message: "Everything is fine, your email has been confirmed, now login and feel at home!!11!",
       success: true,
       status: 200
     })

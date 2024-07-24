@@ -45,7 +45,7 @@
  *         username:
  *           type: string
  *           example: "johndoe"
- *           description: Имя пользователя
+ *           description: Имя пользователя, минимум 4 символа
  *         email:
  *           type: string
  *           example: "johndoe@example.com"
@@ -53,7 +53,7 @@
  *         password:
  *           type: string
  *           example: "password123"
- *           description: Пароль пользователя (хранится в захешированном виде)
+ *           description: Пароль (хранится в захешированном виде), минимум 6 символов, хотя был однв буква и хотя бы одна цифра
  *         roleBits:
  *           type: integer
  *           example: 7

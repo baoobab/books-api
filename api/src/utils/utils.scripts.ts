@@ -21,3 +21,25 @@ export const generateJWT = async (jwtUser: JwtUserDto, expiresIn: string = '10h'
     {expiresIn: expiresIn}
   )
 }
+
+export const validateUsername = (username: string) => {
+  const minLength = 4;
+  return username && username.length >= minLength;
+}
+
+export const validateEmail = (email: string) => {
+  const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+  return emailPattern.test(email)
+}
+
+export const validatePassword = (password: string) => {
+  const minLength = 6;
+  const hasLetter = /[a-zA-Z]/.test(password)
+  const hasNumbers = /\d/.test(password)
+
+  return (
+    password.length >= minLength &&
+    hasLetter &&
+    hasNumbers
+  )
+}

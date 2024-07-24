@@ -71,6 +71,8 @@ router.get('/confirm', confirmEmail);
  *         description: Пользователь успешно зарегистрирован
  *       '400':
  *         description: Неверные данные
+ *       '409':
+ *         description: Такой пользователь уже сущетсвует
  */
 router.post('/register', register);
 
