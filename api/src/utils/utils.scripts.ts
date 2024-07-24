@@ -14,7 +14,7 @@ export const generateUUID = async (): Promise<string> => {
   return uuidv4();
 }
 
-export const generateJWT = async (jwtUser: JwtUserDto, expiresIn: string = '1d'): Promise<string> => {
+export const generateJWT = async (jwtUser: JwtUserDto, expiresIn: string = '10h'): Promise<string> => {
   return jwt.sign(
     jwtUser,
     secret,

@@ -1,15 +1,14 @@
-import {NextFunction, Request, Response} from 'express';
+import {Request, Response, NextFunction} from 'express';
 import jwt from 'jsonwebtoken';
-import {User} from '../models/users.model';
-import {ERRORS_MESSAGES, Roles} from "../shared/enums";
-import {hasRole} from "../utils/roles.matcher";
+import {ERRORS_MESSAGES, Roles} from '../shared/enums';
+import {JwtUserDto} from '../dto/jwt-user.dto';
+import {hasRole} from '../utils/roles.matcher';
 
+const secret = process.env.JWT_SECRET || 'your_secret_key';
 
-const secret = process.env.JWT_SECRET || 'yourSecretKey';
-
-export const jwtAuth = (roles: Roles[]) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    const token = req.headers.authorization?.split(' ')[1]
+export const jwtAuth = (role: Roles) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const token = req.cookies.token
 
     if (!token) {
       return res.status(401).json({
@@ -18,27 +17,22 @@ export const jwtAuth = (roles: Roles[]) => {
       })
     }
 
-    jwt.verify(token, secret, (err, decoded) => {
-      if (err) {
+    try {
+      const jwtUser: JwtUserDto = jwt.verify(token, secret) as JwtUserDto
+      if (!hasRole(jwtUser.roleBits, role)) {
         return res.status(403).json({
           message: ERRORS_MESSAGES.FORBIDDEN,
           status: 403
         })
       }
 
-      const user: User = decoded as User
-
-      const hasRequiredRole = roles.some(role => hasRole(user.roleBits, role))
-
-      if (roles.length > 0 && !hasRequiredRole) {
-        return res.status(403).json({
-          message: ERRORS_MESSAGES.FORBIDDEN,
-          status: 403
-        })
-      }
-
-      req.body.user = user
+      res.locals.user = jwtUser
       next()
-    })
+    } catch {
+      return res.status(403).json({
+        message: ERRORS_MESSAGES.FORBIDDEN,
+        status: 403
+      })
+    }
   }
 }

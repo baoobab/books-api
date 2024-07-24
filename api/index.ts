@@ -1,4 +1,5 @@
 import express, {Application} from 'express';
+import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsDoc from 'swagger-jsdoc';
@@ -30,6 +31,7 @@ async function bootstrap() {
   await initDatabase()
 
   app.use(express.json())
+  app.use(cookieParser())
   app.use('/books', BooksRoutes)
   app.use('/users', UsersRoutes)
 
