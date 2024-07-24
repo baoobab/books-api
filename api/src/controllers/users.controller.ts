@@ -71,7 +71,10 @@ export const login = async (req: Request, res: Response) => {
     const token = await generateJWT(jwtUser)
 
     res.locals.user = jwtUser
-    res.set('Authorization', `Bearer ${token}`)
+    res.cookie('token', token, {
+      httpOnly: true,
+      maxAge: 36000000,
+    })
     res.status(200).json({
       username: jwtUser.username,
       token: token,
@@ -104,8 +107,15 @@ export const getCurrentUser = async (req: Request, res: Response) => {
 }
 
 export const updateRole = async (req: Request, res: Response) => {
-  const userId = Number(req.params.id);
-  const role: Roles = Number(req.body.role);
+  const userId = Number(req.params.id)
+  const role: Roles = Number(req.body.role)
+
+  if (!Object.values(Roles).includes(role)) {
+    return res.status(400).json({
+      message: ERRORS_MESSAGES.BAD_REQUEST,
+      status: 400
+    })
+  }
 
   try {
     if (!(await getUserById(userId))) {
@@ -116,10 +126,15 @@ export const updateRole = async (req: Request, res: Response) => {
     }
 
     const jwtUser: JwtUserDto = await updateRoleAndGetUser(userId, role)
-    const token = await generateJWT(jwtUser)
+    if (jwtUser.id === res.locals.user.id) {
+      const token = await generateJWT(jwtUser)
 
-    res.locals.user = jwtUser
-    res.setHeader('Authorization', `Bearer ${token}`)
+      res.locals.user = jwtUser
+      res.cookie('token', token, {
+        httpOnly: true,
+        maxAge: 36000000,
+      })
+    }
     res.status(200).json(jwtUser)
   } catch (error) {
     res.status(500).json({

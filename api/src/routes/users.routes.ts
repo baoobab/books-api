@@ -9,9 +9,9 @@ router.post('/register', register)
 
 router.post("/login", login)
 
-router.get("/me", jwtAuth([Roles.USER]), getCurrentUser)
+router.get("/me", jwtAuth(Roles.USER), getCurrentUser)
 
-router.put('/:id/role', jwtAuth([Roles.ADMIN]), updateRole)
+router.put('/:id/role', jwtAuth(Roles.ADMIN), updateRole)
 
 
 export default router;
