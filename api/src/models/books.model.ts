@@ -1,7 +1,7 @@
 export interface Book {
   readonly id: number;
-  title: string;
-  author: string;
-  genres: string;
-  publicationDate: Date;
+  readonly title: string;
+  readonly author: string;
+  readonly genres: string;
+  readonly publicationDate: Date;
 }

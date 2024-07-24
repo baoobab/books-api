@@ -2,8 +2,9 @@ export interface User {
   readonly id: number;
   readonly username: string;
   readonly email: string;
-  password: string;
-  roleBits: number;
-  readonly createdAt: Date;
-  updatedAt: Date;
+  readonly password: string;
+  readonly roleBits: number;
+  readonly confirmationToken: string;
+  readonly created_at: Date;
+  readonly updated_at: Date;
 }
