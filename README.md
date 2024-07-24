@@ -7,3 +7,6 @@ npm install
 ```
 npm run start
 ```
+
+
+Docs: /api-docs
