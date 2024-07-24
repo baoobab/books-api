@@ -4,7 +4,6 @@ import {createBook, deleteBook, getAllBooks, getBookById, updateBook} from "../s
 import {CreateBookDto} from "../dto/create-book.dto";
 import {Book} from "../models/books.model";
 import {UpdateBookDto} from "../dto/update-book.dto";
-import {isArgumentsObject} from "util/types";
 
 
 export const create = async (req: Request, res: Response) => {

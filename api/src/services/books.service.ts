@@ -9,7 +9,8 @@ import createHttpError from "http-errors";
 export const createBook = async (data: CreateBookDto) => {
   try {
     const result = await pool.query<Book>(
-      'INSERT INTO books (title, author, publicationDate, genres) VALUES ($1, $2, $3, $4) RETURNING *',
+      'INSERT INTO books (title, author, publicationDate, genres) VALUES ($1, $2, $3, $4) ' +
+      'RETURNING id, title, author, publicationDate AS "publicationDate", genres',
       [data.title, data.author, data.publicationDate, data.genres]
     )
     return result.rows[0]
@@ -21,7 +22,7 @@ export const createBook = async (data: CreateBookDto) => {
 export const getAllBooks = async () => {
   try {
     const result = await pool.query<Book>(
-      'SELECT * FROM books'
+      'SELECT id, title, author, publicationDate AS "publicationDate", genres FROM books'
     )
     return result.rows
   } catch (error) {
@@ -32,7 +33,9 @@ export const getAllBooks = async () => {
 export const getBookById = async (id: number) => {
   try {
     const result =
-      await pool.query<Book>('SELECT * FROM books WHERE id = $1', [id])
+      await pool.query<Book>('' +
+        'SELECT id, title, author, publicationDate AS "publicationDate", genres FROM books WHERE id = $1',
+        [id])
     return result.rows[0] || null
   } catch (error) {
     throw createHttpError(500, ERRORS_MESSAGES.INTERNAL_SERVER_ERROR);
@@ -52,7 +55,9 @@ export const updateBook = async (id: number, data: UpdateBookDto) => {
 export const deleteBook = async (id: number) => {
   try {
     const result =
-      await pool.query<Book>('DELETE FROM books WHERE id = $1 RETURNING *', [id])
+      await pool.query<Book>(
+        'DELETE FROM books WHERE id = $1 ' +
+        'RETURNING id, title, author, publicationDate AS "publicationDate", genres', [id])
     return result.rows[0] || null
   } catch (error) {
     throw createHttpError(500, ERRORS_MESSAGES.INTERNAL_SERVER_ERROR);
@@ -67,6 +72,6 @@ const generateUpdateQuery = (id: number, data: UpdateBookDto): string => {
     query += `${key} = '${data[key as keyof UpdateBookDto]}', `
   }
   query = query.slice(0, query.length - 2)
-  query += ` WHERE id = ${id} RETURNING *`
+  query += ` WHERE id = ${id} RETURNING id, title, author, publicationDate AS "publicationDate", genres`
   return counter == 0 ? "" : query;
 }

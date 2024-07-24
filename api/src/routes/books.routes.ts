@@ -11,7 +11,8 @@ router.get("/", getAll)
 
 router.get("/:id", getById)
 
-router.put('/:id', jwtAuth([Roles.ADMIN]), update)
+router.put('/:id', update)
+// router.put('/:id', jwtAuth([Roles.ADMIN]), update)
 
 router.delete('/:id', jwtAuth([Roles.ADMIN]), remove)
 
