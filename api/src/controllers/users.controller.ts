@@ -43,7 +43,11 @@ export const register = async (req: Request, res: Response) => {
         status: 400
       })
     }
-    await sendConfirmationMail(createdUser.email, confirmationToken) // с await'ом, т.к. гарантируем ответ от почтового сервиса
+    await sendConfirmationMail(
+      createdUser.email,
+      confirmationToken,
+      req.get('host') || "",
+      req.protocol) // с await'ом, т.к. гарантируем ответ от почтового сервиса
     res.status(201).json(createdUser)
   } catch (error) {
     res.status(500).json({
