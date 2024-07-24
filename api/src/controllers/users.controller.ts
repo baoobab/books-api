@@ -109,7 +109,7 @@ export const login = async (req: Request, res: Response) => {
     })
     res.status(200).json({
       username: jwtUser.username,
-      // token: token,
+      token: token,
       status: 200
     })
   } catch (error) {
