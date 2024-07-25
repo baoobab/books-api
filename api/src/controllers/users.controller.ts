@@ -17,16 +17,32 @@ import {
   generateJWT,
   generateUUID,
   hashString,
-  validateEmail,
+  validateEmail, validateObject,
   validatePassword,
   validateUsername
 } from "../utils/utils.scripts";
 import {JwtUserDto} from "../dto/jwt-user.dto";
+import {Book} from "../models/books.model";
 
 
 export const register = async (req: Request, res: Response) => {
   try {
     const userDto: RegisterUserDto = req.body
+
+    const requiredFields: (keyof RegisterUserDto)[] = ['username', 'email', 'password']
+    const errors: string[] = []
+
+    for (const field of validateObject(requiredFields, userDto)) {
+      errors.push(`Missing ${field} field`)
+    }
+    if (errors.length) {
+      return res.status(400).json({
+        message: ERRORS_MESSAGES.BAD_REQUEST,
+        errors: errors,
+        status: 400
+      })
+    }
+
     if (!validateUsername(userDto.username)) {
       return res.status(400).json({
         message: ERRORS_MESSAGES.BAD_USERNAME_FORMAT,
@@ -37,6 +53,7 @@ export const register = async (req: Request, res: Response) => {
     if (!validateEmail(userDto.email)) {
       return res.status(400).json({
         message: ERRORS_MESSAGES.BAD_EMAIL_FORMAT,
+        error: "Email must be like this format: example@mail.cool",
         status: 400
       })
     }

@@ -43,3 +43,11 @@ export const validatePassword = (password: string) => {
     hasNumbers
   )
 }
+
+export const validateObject = (requiredFields: string[], currentObject: object) => {
+  const missingFields: string[] = []
+  for (const field of requiredFields) {
+    if (!(field in currentObject)) missingFields.push(field);
+  }
+  return missingFields
+}

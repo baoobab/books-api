@@ -4,11 +4,27 @@ import {createBook, deleteBook, getAllBooks, getBookById, updateBook} from "../s
 import {CreateBookDto} from "../dto/create-book.dto";
 import {Book} from "../models/books.model";
 import {UpdateBookDto} from "../dto/update-book.dto";
+import {validateObject} from "../utils/utils.scripts";
 
 
 export const create = async (req: Request, res: Response) => {
   try {
     const bookData: CreateBookDto = req.body
+
+    const requiredFields: (keyof Book)[] = ['title', 'author', 'genres', 'publicationDate']
+    const errors: string[] = []
+
+    for (const field of validateObject(requiredFields, bookData)) {
+      errors.push(`Missing ${field} field`)
+    }
+    if (errors.length) {
+      return res.status(400).json({
+        message: ERRORS_MESSAGES.BAD_REQUEST,
+        errors: errors,
+        status: 400
+      })
+    }
+
     const newBook: Book = await createBook(bookData)
     res.status(201).json(newBook)
   } catch (error) {
