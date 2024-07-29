@@ -5,6 +5,14 @@
     ```
 
 ## Run
+
+### Using Docker Compose
+1) Build and Start the Containers:
+```
+docker compose up --build
+```
+
+### Using Node.js Directly
 ```
 npm run start
 ```
